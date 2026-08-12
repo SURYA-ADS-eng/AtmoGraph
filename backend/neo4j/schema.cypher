@@ -1,0 +1,37 @@
+// AtmoGraph Supply Chain Graph Schema
+
+CREATE CONSTRAINT country_id IF NOT EXISTS
+FOR (c:Country)
+REQUIRE c.id IS UNIQUE;
+
+CREATE CONSTRAINT supplier_id IF NOT EXISTS
+FOR (s:Supplier)
+REQUIRE s.id IS UNIQUE;
+
+CREATE CONSTRAINT manufacturer_id IF NOT EXISTS
+FOR (m:Manufacturer)
+REQUIRE m.id IS UNIQUE;
+
+CREATE CONSTRAINT factory_id IF NOT EXISTS
+FOR (f:Factory)
+REQUIRE f.id IS UNIQUE;
+
+CREATE CONSTRAINT port_id IF NOT EXISTS
+FOR (p:Port)
+REQUIRE p.id IS UNIQUE;
+
+CREATE CONSTRAINT route_id IF NOT EXISTS
+FOR (r:ShippingRoute)
+REQUIRE r.id IS UNIQUE;
+
+CREATE CONSTRAINT distributor_id IF NOT EXISTS
+FOR (d:Distributor)
+REQUIRE d.id IS UNIQUE;
+
+CREATE CONSTRAINT retailer_id IF NOT EXISTS
+FOR (r:Retailer)
+REQUIRE r.id IS UNIQUE;
+
+CREATE CONSTRAINT product_id IF NOT EXISTS
+FOR (p:Product)
+REQUIRE p.id IS UNIQUE;
