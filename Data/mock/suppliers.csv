@@ -1,0 +1,5 @@
+id,name,country,industry,reliability_score
+S001,India Metals,India,Raw Materials,0.92
+S002,China Components,China,Electronics,0.88
+S003,Japan Precision Parts,Japan,Electronics,0.95
+S004,Germany Industrial Parts,Germany,Automotive,0.91
