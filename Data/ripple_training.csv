@@ -1,0 +1,9 @@
+node_id,feature_supply_delay,feature_transport_risk,feature_demand_spike,label
+1,0.2,0.1,0.3,0   # Supplier stable, no disruption
+2,0.8,0.4,0.6,1   # Supplier disruption → ripple downstream
+3,0.5,0.7,0.2,1   # Port strike → ripple effect
+4,0.1,0.2,0.9,1   # Demand spike → retailer affected
+5,0.3,0.1,0.2,0   # Warehouse stable
+6,0.6,0.5,0.4,1   # Shipping company delay → ripple downstream
+7,0.2,0.3,0.1,0   # Manufacturer stable
+8,0.9,0.8,0.7,1   # Major disruption node
