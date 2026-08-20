@@ -3,12 +3,17 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from neo4j import GraphDatabase
-from utils import nlp_processor   # import your NLP module
+import torch
+import torch.nn.functional as F
+from models.ripple_gnn import RippleGCN, load_ripple_dataset
 
 # --- Config ---
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "password"
+
+MODEL_PATH = "backend/models/model.pth"
+TRAINING_DATA = "data/ripple_training.csv"
 
 # --- FastAPI App ---
 app = FastAPI(title="AtmoGraph API", version="1.0")
@@ -23,6 +28,23 @@ class NewsText(BaseModel):
 class PredictionRequest(BaseModel):
     disruption_id: str
 
+# --- Load Dataset & Model ---
+data = load_ripple_dataset(TRAINING_DATA)
+num_features = data.num_node_features
+num_classes = len(set(data.y.tolist()))
+
+model = RippleGCN(num_node_features=num_features,
+                  hidden_channels=16,
+                  num_classes=num_classes)
+
+# Load trained weights if available
+try:
+    model.load_state_dict(torch.load(MODEL_PATH))
+    model.eval()
+    print("RippleGCN model loaded successfully.")
+except FileNotFoundError:
+    print("No trained model found. Please train and save model.pth.")
+
 # --- Routes ---
 @app.get("/")
 def root():
@@ -30,46 +52,33 @@ def root():
 
 @app.post("/ingest_news")
 def ingest_news(news: NewsText):
-    """
-    Ingest raw news text, extract entities with NLP,
-    and insert disruption + affected nodes into Neo4j.
-    """
-    entities = nlp_processor.extract_entities(news.text)
-
+    # Placeholder: NLP ingestion handled separately
     with driver.session() as session:
-        # Create disruption node
         session.run(
             """
-            CREATE (d:Disruption {id:$id, text:$text, date:date()})
+            CREATE (:Disruption {id:$id, text:$text, date:date()})
             """,
             id="E" + str(hash(news.text)), text=news.text
         )
-
-        # Link disruption to extracted entities
-        for ent in entities:
-            session.run(
-                """
-                MERGE (n:Entity {name:$name, type:$type})
-                WITH n
-                MATCH (d:Disruption {id:$id})
-                CREATE (d)-[:AFFECTS]->(n)
-                """,
-                name=ent["text"], type=ent["label"], id="E" + str(hash(news.text))
-            )
-
-    return {"status": "success", "entities": entities}
+    return {"status": "success", "event": news.text}
 
 @app.post("/predict_ripple")
 def predict_ripple(req: PredictionRequest):
     """
-    Placeholder for GNN ripple effect prediction.
-    Later: connect PyTorch Geometric model here.
+    Run GNN inference for ripple effect prediction.
     """
-    return {"disruption_id": req.disruption_id, "predicted_delay_months": 3}
+    with torch.no_grad():
+        out = model(data.x, data.edge_index)
+        prediction = out.argmax(dim=1).tolist()
+
+    return {
+        "disruption_id": req.disruption_id,
+        "predictions": prediction,
+        "note": "0 = no ripple, 1 = ripple effect"
+    }
 
 @app.get("/graph_data")
 def graph_data():
-    """Return supply chain graph nodes and relationships"""
     with driver.session() as session:
         result = session.run("MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 50")
         edges = []
