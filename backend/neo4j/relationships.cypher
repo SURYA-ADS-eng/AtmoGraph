@@ -1,116 +1,48 @@
-// ========================================
-// AtmoGraph - Supply Chain Relationships
-// ========================================
+// ============================================
+// AtmoGraph Ripple Effect Traversal Queries
+// ============================================
+
+// Find direct dependencies of a disrupted supplier
+MATCH (s:Supplier {id: $supplier_id})
+      -[r:SUPPLIES]->(p:Product)
+RETURN s, r, p;
 
 
-// SUPPLIER → MANUFACTURER
-
-MATCH (s:Supplier {id: "S001"}),
-      (m:Manufacturer {id: "M001"})
-CREATE (s)-[:SUPPLIES]->(m);
-
-MATCH (s:Supplier {id: "S002"}),
-      (m:Manufacturer {id: "M002"})
-CREATE (s)-[:SUPPLIES]->(m);
-
-MATCH (s:Supplier {id: "S003"}),
-      (m:Manufacturer {id: "M003"})
-CREATE (s)-[:SUPPLIES]->(m);
+// Find first-level downstream impact
+MATCH path =
+      (s:Supplier {id: $supplier_id})
+      -[:SUPPLIES|PRODUCES*1..2]->
+      (target)
+RETURN path
+LIMIT 50;
 
 
-// MANUFACTURER → FACTORY
-
-MATCH (m:Manufacturer {id: "M001"}),
-      (f:Factory {id: "F001"})
-CREATE (m)-[:OPERATES]->(f);
-
-MATCH (m:Manufacturer {id: "M002"}),
-      (f:Factory {id: "F002"})
-CREATE (m)-[:OPERATES]->(f);
-
-MATCH (m:Manufacturer {id: "M003"}),
-      (f:Factory {id: "F003"})
-CREATE (m)-[:OPERATES]->(f);
+// Find multi-level ripple effects through the
+// supply-chain dependency graph
+MATCH path =
+      (d:Disruption {id: $disruption_id})
+      -[*1..4]->
+      (affected)
+RETURN path,
+       length(path) AS impact_depth
+ORDER BY impact_depth;
 
 
-// FACTORY → SHIPPING ROUTE
-
-MATCH (f:Factory {id: "F001"}),
-      (r:ShippingRoute {id: "R001"})
-CREATE (f)-[:SHIPS_THROUGH]->(r);
-
-MATCH (f:Factory {id: "F002"}),
-      (r:ShippingRoute {id: "R002"})
-CREATE (f)-[:SHIPS_THROUGH]->(r);
+// Identify affected products from a disrupted supplier
+MATCH (s:Supplier {id: $supplier_id})
+      -[:SUPPLIES]->(p:Product)
+RETURN
+    s.name AS supplier,
+    collect(p.name) AS affected_products;
 
 
-// SHIPPING ROUTE → PORT
-
-MATCH (r:ShippingRoute {id: "R001"}),
-      (p:Port {id: "P003"})
-CREATE (r)-[:CONNECTS_TO]->(p);
-
-MATCH (r:ShippingRoute {id: "R002"}),
-      (p:Port {id: "P003"})
-CREATE (r)-[:CONNECTS_TO]->(p);
-
-MATCH (r:ShippingRoute {id: "R003"}),
-      (p:Port {id: "P004"})
-CREATE (r)-[:CONNECTS_TO]->(p);
-
-
-// PORT → DISTRIBUTOR
-
-MATCH (p:Port {id: "P003"}),
-      (d:Distributor {id: "D001"})
-CREATE (p)-[:DISTRIBUTES_TO]->(d);
-
-MATCH (p:Port {id: "P004"}),
-      (d:Distributor {id: "D002"})
-CREATE (p)-[:DISTRIBUTES_TO]->(d);
-
-
-// DISTRIBUTOR → RETAILER
-
-MATCH (d:Distributor {id: "D001"}),
-      (r:Retailer {id: "RT001"})
-CREATE (d)-[:SELLS_TO]->(r);
-
-MATCH (d:Distributor {id: "D002"}),
-      (r:Retailer {id: "RT002"})
-CREATE (d)-[:SELLS_TO]->(r);
-
-
-// MANUFACTURER → PRODUCT
-
-MATCH (m:Manufacturer {id: "M001"}),
-      (p:Product {id: "PR001"})
-CREATE (m)-[:MANUFACTURES]->(p);
-
-MATCH (m:Manufacturer {id: "M002"}),
-      (p:Product {id: "PR001"})
-CREATE (m)-[:MANUFACTURES]->(p);
-
-MATCH (m:Manufacturer {id: "M003"}),
-      (p:Product {id: "PR002"})
-CREATE (m)-[:MANUFACTURES]->(p);
-
-
-// ENTITY → COUNTRY
-
-MATCH (s:Supplier {id: "S001"}),
-      (c:Country {id: "C001"})
-CREATE (s)-[:LOCATED_IN]->(c);
-
-MATCH (s:Supplier {id: "S002"}),
-      (c:Country {id: "C002"})
-CREATE (s)-[:LOCATED_IN]->(c);
-
-MATCH (m:Manufacturer {id: "M001"}),
-      (c:Country {id: "C001"})
-CREATE (m)-[:LOCATED_IN]->(c);
-
-MATCH (m:Manufacturer {id: "M002"}),
+// Calculate the number of downstream entities
+MATCH (s:Supplier {id: $supplier_id})
+      -[*1..4]->
+      (affected)
+RETURN
+    s.name AS source_supplier,
+    count(DISTINCT affected) AS affected_entities;MATCH (m:Manufacturer {id: "M002"}),
       (c:Country {id: "C002"})
 CREATE (m)-[:LOCATED_IN]->(c);
 
