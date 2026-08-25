@@ -13,7 +13,7 @@ NEO4J_USER = "neo4j"
 NEO4J_PASSWORD = "password"
 
 MODEL_PATH = "backend/models/model.pth"
-TRAINING_DATA = "data/ripple_training.csv"
+TRAINING_DATA = "../Data/ripple_training.csv"
 
 # --- FastAPI App ---
 app = FastAPI(title="AtmoGraph API", version="1.0")

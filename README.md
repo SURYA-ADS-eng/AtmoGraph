@@ -1,10 +1,16 @@
-# AtmoGraph
+# React + Vite
 
-AtmoGraph is an AI-powered supply chain ripple-effect prediction system.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Week 1 Progress
+Currently, two official plugins are available:
 
-- Initialized AtmoGraph project repository
-- Set up local Neo4j database
-- Created AtmoGraphDB instance
-- Defined the initial graph-based supply chain architecture
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
