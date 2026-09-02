@@ -31,21 +31,7 @@ and consumer markets.
 - **Node category filter** and a decorative **AI pipeline** panel, matching
   the reference UI.
 
-## Getting started
 
-```bash
-npm install
-npm run dev
-```
-
-Then open the printed local URL (usually `http://localhost:5173`).
-
-To build for production:
-
-```bash
-npm run build
-npm run preview
-```
 
 ## Project structure
 
@@ -74,11 +60,3 @@ atmograph/
         └── ImpactPanel.jsx
 ```
 
-## Extending it
-
-- Add more nodes/edges in `src/data/graph.js` — coordinates are on a fixed
-  1000×600 canvas, so new nodes just need an `x`/`y` and a `category`.
-- Add more news events in `src/data/news.js` — each just needs a
-  `nodeId` (which graph node it disrupts) and a `severity`.
-- Swap the simulation in `src/data/simulate.js` for a real backend/model
-  call if you want live predictions instead of the deterministic mock.
