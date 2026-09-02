@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: #0a0e1a;
+  color: #e5e9f5;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a3554;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #38466e;
+}
+
+@keyframes ripple-pulse {
+  0% { r: 14; opacity: 0.9; }
+  70% { r: 34; opacity: 0; }
+  100% { r: 34; opacity: 0; }
+}
+
+@keyframes dash-flow {
+  to { stroke-dashoffset: -20; }
+}
+
+.animate-dash {
+  stroke-dasharray: 4 4;
+  animation: dash-flow 1s linear infinite;
+}
+
+.pulse-ring {
+  animation: ripple-pulse 1.8s ease-out infinite;
+}
